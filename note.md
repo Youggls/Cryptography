@@ -1,3 +1,7 @@
+# 现代密码学
+
+> 2021 级南开大学计算机学院（研究生课）密码学期末重点
+
 ## 1 现代密码学基本原则
 
 ### 1.1 现代密码学的三个基本原则
@@ -379,7 +383,7 @@
 
 - 在 Feistel 网络中
 
-  - 输入长度为 $n$，被分为登场的两半，左半部分为 $L_0$，右半部分为 $R_0$
+  - 输入长度为 $n$，被分为等长的两半，左半部分为 $L_0$，右半部分为 $R_0$
 
   - 在第 $i$ 轮中：
     - 轮函数为 $f_i:\{0,1\}^{n/2}\rarr\{0,1\}^{n/2}$，由子密钥 $k_i$ 定义
@@ -403,3 +407,157 @@
   输入微小的变化，导致输出很大的变化（出判断填空题）
 
 - 例 2：给定轮函数和初值，计算若干论后 Feistel 网络的输出
+
+## 6 MAC 与 Hash
+
+### 6.1 消息鉴别码
+
+#### 6.1.1 数据完整性
+
+数据的完整性保证了接收方接受的信息来源于发送方，且未遭受篡改，即使主动的敌手控制了通信信道
+
+#### 6.1.2 定义
+
+- 一个**消息鉴别码**方案可以由概率多项式时间算法 $(Gen,Mac,Vrfy)$ 组成：
+
+  - $Gen$ 密钥生成算法：输入安全参数 $\lambda$，输出密钥 $k(|k|\geq\lambda)$
+
+  - $Mac$ 标记生成算法：输入密钥 $k$ 和明文 $m\in\{0,1\}^*$，输出标记  $t$
+
+    $t\larr Mac_k(m)$
+
+  - $Vrfy$ 校验算法：输入密钥 $k$ 和标记 $t$，输出比特位 $b$
+
+    $b:=Vrfy_k(m,t)$
+
+    如果 $b=1$，证明消息有效，否则无效
+
+  - 如果该方案是正确的，则对于所有的 $m\in\{0,1\}^*$ 和由 $Gen$ 输出的 $k$ 均有
+
+    $Vrfy_k(m,Mac_k(m))=1$
+
+#### 6.1.3 安全性
+
+- 消息鉴别码：安全性
+
+  - 威胁模型：允许敌手访问一个 $MAC$ 预言机 $Mac_k(\cdot)$，敌手可以提交任何消息明文 $m$ 给预言机，得到相应的标记 $t\larr Mac_k(m)$
+  - 安全目标：
+    - ”存在性不可伪造“
+    - 敌手无法伪造任何（未向 $Mac$ 预言机询问过的）消息明文的有效标记
+    - 暂时不考虑重放（replay）
+
+- 消息鉴别码：安全性定义
+
+  - 给定消息鉴别码方案 $\Pi=(Gen,Mac,Vrfy)$ 和敌手 $\mathcal A$，定义实验：
+
+  - 消息鉴别码伪造实验 $Mac-forge_{\mathcal A,\Pi}(\lambda)$
+
+    - 挑战者运行 $Gen(\lambda)$ 生成一个密钥 $k$
+    - 挑战者给定输入 $\lambda$ 给 $\mathcal A$，$\mathcal A$ 可以访问预言机 $Mac_k(\cdot)$，最后输出 $m$ 和 $t$，其向预言机询问过的消息集合为 $\mathcal Q$
+    - 如果 $Vrfy_k(m,t)=1$ 且 $m\notin \mathcal Q$，则实验输出 1，否则输出 0
+
+  - 定义：如果对于所有**概率多项式时间**敌手 $\mathcal A$，存在一个可忽略的函数 $negl$ 使得
+
+    $Pr[Mac-forge_{\mathcal A,\Pi}=1]\leq negl(\lambda)$
+
+    则称 $\Pi$ 是适应性选择消息攻击下存在性不可伪造的，或者说是安全的。
+
+- 重放攻击
+
+  重放攻击（Replay Attack）：敌手复制并发送某一方之前发出的一条消息和 MAC 标记
+
+  - 消息鉴别码机制不能阻止重放攻击：无状态的机制都不能阻止
+  - 一般来说，重放攻击的防御都在与应用相关（由应用规定消息内容是否合法），例如：序列号、时间戳
+
+#### 6.1.4 消息鉴别码的安全构造
+
+- 安全 MAC-定长构造
+
+  消息长度为 $\lambda$ 的定长消息鉴别码方案 $\Pi=(Gen,Mac,Vrfy)$
+
+  - $F:\{0,1\}^\lambda\rarr \{0,1\}^\lambda$ 是一个伪随机函数
+
+  - 密钥生成算法 $Gen$：均匀随机地选择 $k\larr\{0,1\}^\lambda$ 作为密钥输出
+
+  - 标记生成算法 $Mac$：给定密钥 $k\in \{0,1\}^\lambda$ 和消息明文 $m\in \{0,1\}^\lambda$，定义输出
+
+    $Mac_k(m)=F_k(m)$
+
+  - 校验算法 $Vrfy$：给定密钥 $k\in\{0,1\}^\lambda$、消息明文 $m\in\{0,1\}^\lambda$ ，以及标记 $t\in \{0,1\}^\lambda$，判断 $t?=F_k(m)$，如果成立输出 1；否则输出 0
+
+- 定理：如果 $F$ 是一个伪随机函数，那么定长方案 $\Pi$ 是适应性选择消息攻击下存在性不可伪造的
+
+  证明：规约，利用敌手 $\mathcal A$ 构造一个区分器 $\mathcal D$，使得如果 $\mathcal A$ 可以攻击成功，则 $\mathcal D$ 可以区分预言机 $\mathcal O$ 是伪随机函数还是随机选取的函数
+
+  - 令 $\mathcal A$ 为一个 PPT 敌手，定义 $\epsilon(\lambda)=Pr[Mac-forge_{\mathcal A, \Pi}(\lambda)=1]$
+  - 构造一个区分器 $\mathcal D^{\mathcal O(\cdot)}$，其可以访问函数的预言机 $\mathcal O:\{0,1\}^\lambda\rarr\{0,1\}^\lambda$
+    - 运行 $\mathcal A$，无论何时 $\mathcal A$ 向加密预言机发出关于 $m$ 的询问，用下述方法应答：
+      - 询问预言机获得 $t\larr\mathcal O(m)$，将 $t$ 返回
+      - 当 $\mathcal A$ 运行结束时，输出一对 $m$ 和  $t$
+      - 询问预言机获得 $t'\larr\mathcal O(m)$
+      - 如果 $t'=t$，则输出 1，否则输出 0
+    - 构造方案 $\Pi'=(Gen',Mac',Vrfy')$，使用均匀随机选取的函数 $f\in Func_\lambda$ 代替方案 $\Pi$ 的 $Mac$ 中的 $F_k$，其余均相同
+    - 在实验 $Mac-forge_{\mathcal A,\Pi'}$ 中
+      - 因为对于任意 $m\notin \mathcal Q$，在看来，$t=f(m)$ 是在 $\{0,1\}^\lambda$ 上均匀选取的
+      - 所以 $Pr[Mac-forge_{\mathcal A,\Pi'}(\lambda)=1]=1/2^\lambda$
+    - 观察给定不同预言机 $\mathcal O$ 时 $\mathcal D$ 的输出，证明 $\mathcal D$ 的有效性
+    - 当预言机为一个在 $Func_\lambda$ 上均匀随机选取的函数 $f$ 时：
+      - $\mathcal A$ 在所见内容的分布与其在实验 $Mac-forge_{\mathcal A,\Pi'}(\lambda)$ 中完全相同
+      - $Pr[\mathcal D^{f(\cdot)}(\lambda)=1]=Pr[Mac-forge_{\mathcal A,\Pi'}(\lambda)=1]=1/2^\lambda$
+    - 当预言机为一个伪随机函数 $F_k$ 时，其中 $k$ 在 $\{0,1\}^\lambda$ 上均匀选取
+      - $\mathcal A$ 在所见内容的分布与其在实验 $Mac-forge_{\mathcal A,\Pi}(\lambda)$ 中完全相同（其所见标记均由 $Mac_k(\cdot)$ 生成）
+      - 此时 $Pr[\mathcal D^{F_k(\cdot)}(\lambda)=1]=Pr[Mac-forge_{\mathcal A, \Pi}(\lambda)=1]=\epsilon(\lambda)$
+    - 因此 $|Pr[\mathcal D^{F_k(\cdot)}(\lambda)=1]-Pr[\mathcal D^{f(\cdot)}(\lambda)=1]|\geq \epsilon(\lambda)-1/2^\lambda$
+    - 然而并不存在有效的 $\mathcal D$，所以 $\epsilon(\lambda)-1/2^\lambda$ 可忽略
+    - 又因为 $1/2^\lambda$ 可忽略，所以 $\epsilon(\lambda)$ 可忽略，定理得证
+
+### 6.2 Hash
+
+散列函数（Hash Function）是将任意长度的字符串压缩成短的定长摘要的函数 $H(x):\{0,1\}^*\rarr\{0,1\}^l$
+
+#### 6.2.1 定义
+
+一个散列函数可以由概率多项式时间算法 $(Gen,H)$ 组成：
+
+- $Gen$ 密钥生成算法：输入安全参数 $\lambda$，输出密钥 $s\ (|s|>\lambda)$
+
+  $s\larr Gen(\lambda)$
+
+- 对 $H$ 输入密钥 $s$ 和一个比特串 $x\in \{0,1\}^*$，输出一个比特串 $H^s(x)\in\{0,1\}^{l(\lambda)}$，其中 $l$ 为多项式
+
+#### 6.2.2 抗碰撞
+
+给定散列函数 $\Pi=(Gen,H)$ 和敌手 $\mathcal A$，定义实验：
+
+散列函数碰撞实验 $Hash-coll_{\mathcal A,\Pi}(\lambda)$
+
+- 挑战者运行 $Gen(\lambda)$ 生成一个密钥 $s$
+- 挑战者给定输入 $s$ 给 $\mathcal A$，最后输出 $x$ 和 $x'$ （如果 $\Pi$ 定长，则 $x$ 和 $x'$ 等长）
+- 如果 $x\neq x'$ 且 $H^s(x)=H^s(x')$，则实验输出 1；否则输出 0
+
+定义：如果对于所有概率多项式时间敌手 $\mathcal A$，存在一个可忽略函数 $negl$ 使得：
+
+​							$Pr[Hash-coll_{\mathcal A, \Pi}(\lambda)=1]\leq negl(\lambda)$
+
+则称 $\Pi$（或者简称为 $H$ 或  $H^s$）是抗碰撞的
+
+#### 6.2.3 安全级别
+
+对于散列函数 $H^s$ 而言，抗碰撞是一个较强的安全性需求，典型的安全级别三种：
+
+- 抗碰撞
+- 抗第二原相：如果给定输入 $s$ 和 $x$，对于 PPT 敌手而言，找到 $x'$ 满足 $x\neq x'$ 且 $H^s(x')=H^s(x)$ 是不可行的
+- 抗原相：如果给定输入 $s$ 和 $y=H^s(x)$，对于 PPT 敌手而言，找到 $x'$ 满足 $H^s(x')=y$ 是不可行的
+
+### 6.3 例题
+
+- 例 1**（必考！）** 如果 $(Gen,h)$ 是一个抗碰撞散列函数，那么由 $H^s(x):=h^s(h^s(x))$ 定义的 $(Gen,H)$ 一定抗碰撞吗，为什么？
+
+  一定抗碰撞，证明如下
+
+  - 假设 $H$ 不抗碰撞，那么：$\exists x\neq y,\ H^s(x)=H^s(y)$
+  - 那么有：$h^s(h^s(x))=h^s(h^s(y))$
+  - 如果 $h^s(x)= h^s(y)$，那么 $(x,y)$ 是 $h$ 的一个碰撞对
+  - 如果 $h^s(x)\neq h^s (y)$，让 $x'=h^s(x),\ y'= h^s(y)$，那么有 $h^s(x')=h^s(y')$，故 $(x',y')$ 为 $h$ 的一个碰撞对
+  - 又因为已知 $h^s$ 为抗碰撞的，故假设不成立，原命题 $H^s$ 抗碰撞成立！
+
