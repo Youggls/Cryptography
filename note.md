@@ -561,3 +561,116 @@
   - 如果 $h^s(x)\neq h^s (y)$，让 $x'=h^s(x),\ y'= h^s(y)$，那么有 $h^s(x')=h^s(y')$，故 $(x',y')$ 为 $h$ 的一个碰撞对
   - 又因为已知 $h^s$ 为抗碰撞的，故假设不成立，原命题 $H^s$ 抗碰撞成立！
 
+## 7 群论
+
+### 7.1 群及其定义
+
+- 定义 群（Group）是由集合 $\mathbb G$ 和其上的二元运算 $\circ$ 构成的代数系统 $(\mathbb G,\circ)$，满足以下性质：
+  - 封闭性：对于任意 $g,h\in \mathbb G$，有 $g\circ h\in \mathbb G$
+  - 结合律：对于任意 $g_1,g_2,g_3\in \mathbb G$，有 $(g_1\circ g_2)\circ g_3=g_1\circ(g_2\circ g_3)$
+  - 有单位元：存在单位元 $e\in \mathbb G$，对任意 $g\in \mathbb G$，有 $e\circ g=g\circ e=g$
+  - 有逆元： 对任意 $g\in\mathbb G$，存在逆元 $h\in\mathbb G$，使得 $g\circ h=h\circ g=e$
+- 如果群 $\mathbb G$ 满足交换律，则被称为阿贝尔群或者交换群，
+  - 交换律：对于任意 $g,h\in \mathbb G$，有 $g\circ h=h\circ g$
+- 定义：有限群 $\mathbb G$ 的阶（order）是 $\mathbb G$ 中元素的个数，即 $|\mathbb G|$
+
+### 7.2 模加群和模乘群
+
+#### 7.2.1 模加群
+
+- 子群：如果 $\mathbb G$ 是一个群 $\mathbb H\subset\mathbb G$，且 $\mathbb H$ 关于 $\mathbb G$ 上的运算构成群，则称 $\mathbb H$ 为 $\mathbb G$ 的子群
+  - 例：$(\mathbb Z,+)$ 是一个阿贝尔群，单位元为 0，$g$ 的逆元为 $-g$，$(\text{even number}, +)$ 是其子群，而 $(\mathbb Z,\cdot)$ 不是群
+- $\mathbb Z_N$ 表示一个模 $N$ 的加法群
+  - 二元运算 $+$ 被定义为集合 $\{0,1,...,N-1\}$ 上的加法模运算
+  - $a+b$ 被定义为 $a+b\ \text{mod}\ N$
+
+#### 7.2.2 模乘群
+
+- 模乘：通常我们用 $\mathbb Z^*_N$ 表示一个模 $N$ 的乘法群
+
+  - 对于任意 $a,b\in\mathbb Z^*_N$，$ab$ 被定义为 $ab\ \text{mod}\ N$
+
+  - 显然满足**结合律**、**交换律**
+
+  - **单位元**为 1
+
+  - 当且仅当 $\text{gcd}(a,N)=1$ 时（$\text{gcd}$ 为最大公约数函数），$a$ 模 $N$ 可逆，所以集合被定义为：
+
+    ​					$\mathbb Z^*_N=\{a\in\{1,2,...,N-1\}\ |\ \text{gcd}(a,N)=1\}$
+
+  - 满足**封闭性**：
+
+    - 如果存在 $c=ab\ \text{mod}\ N$ 且 $a,b\in \mathbb Z^*_N$ 而 $C\notin \mathbb Z^*_N$
+    - 那么存在素数 $p>1$ 使得 $p|\text{gcd}(c,N)$，又 $ab=kN+c$，故 $p|ab$，即 $p|a$ 或 $p|b$
+    - 与 $\text{gcd}(a,N)=1$ 或 $\text{gcd}(b,N)=1$ 矛盾，所以 $c\in \mathbb Z^*_N$
+
+  - 故 $\mathbb Z^*_N$ 为阿贝尔群
+
+- 由于 $\mathbb Z^*_N$ 被定义为 $\{a\in\{1,2,...,N-1\}\ |\ \text{gcd}(a,N)=1\}$，所以其阶为 $\phi(N)$
+
+  - $\phi(N)$ 为欧拉函数，$\phi(N)$ 表示 $\{1,2,...,N-1\}$ 中与 $N$ 互素的元素个数
+
+  - 定理：设 $N=\Pi_ip_i^{e_i}$，其中 $\{p_i\}$ 为互不相同的素数，且 $e_i\geq1$，则
+
+    ​						$\phi(N)=\Pi_ip_i^{e_{i-1}}(p_i-1)$
+
+  - 推论：对于任意 $N>1,\ a\in\mathbb Z^*_N$，有 $a^{\phi(N)}=1\ \text{mod}\ N$
+
+    - **费马小定理**：如果 $p$ 为素数，且 $a\in\{1,2,...,p-1\}$，有 $a^{p-1}=1\ \text{mod}\ p$
+
+#### 7.2.3 循环群
+
+- 设 $\mathbb G$ 为阶为 $m$ 的有限群
+
+  - 对于任意元素 $g\in\mathbb G$，考虑集合 $\{g^0,g^1,...\}$
+  - 该集合包含的元素个数 $i$ 称为 $g$ 的阶，由于 $g^m=1=g^0$，所以 $i\leq m$
+  - 如果 $i=m$，那么该集合包含了 $\mathbb G$ 的所有元素
+    - $g$ 被称为 $\mathbb G$ 的生成元
+    - 如果 $\mathbb G$ 是有生成元的，那么 $\mathbb G$ 被称为循环群
+  - $\mathbb Z_8$ 为一个循环群， $3$ 是生成元而 $2$ 不是
+  - $\mathbb Z_7^*$ 是一个循环群，$3$ 是生成元
+
+- 重要定理
+
+  - 命题：设 $\mathbb G$ 是阶为 $q$ 的有限群，若 $g\in \mathbb G$ 的阶为 $i$，则 $i|q$
+
+  - 推论：如果 $\mathbb G$ 是一个阶为素数 $p$ 的群，则 $\mathbb G$ 为循环群，且除其中单位元外的元素均为 $\mathbb G$ 的生成元
+
+  - 定理：如果 $p$ 为素数，则 $\mathbb Z_p^*$ 为循环群（充分而不必要）
+
+#### 7.2.4 中国剩余定理
+
+- 同构
+
+  令群 $\mathbb G,\ \mathbb H$ 的群运算分别为 $\circ_\mathbb G$ 和 $\circ_\mathbb H$，有函数 $f:\mathbb G\rarr\mathbb H$ 满足：
+
+  - 对任意的 $g_1,g_2\in\mathbb G$，可得 $f(g_1\circ_\mathbb G g_2)=f(g_1)\circ_\mathbb H f(g_2)$
+  - 如果 $f$ 是单射/满射/双射，则被称为从 $\mathbb G$ 到 $\mathbb H$ 的单同态/满同态/同构
+  - 如果存在一个从 $\mathbb G$ 到 $\mathbb H$ 的同构，则称这两个群同构，记作 $\mathbb G \sim \mathbb H$
+
+- 群的叉乘运算：
+
+  - 群 $\mathbb G_1$ 和 $\mathbb G_2$ 的叉乘结果为 $\mathbb G_1 \times \mathbb G_2$，其中元素为有序对 $(g_1,g_2)$，其中 $g_1\in \mathbb G_1$ 和 $g_2 \in \mathbb G_2$
+  - 叉乘结果 $\mathbb G_1 \times \mathbb G_2$ 是一个群
+
+- 定理：设 $N=pq$，其中 $p$ 和 $q$ 互素，则：
+
+  存在同构函数 $f(x):=(x\ \text{mod}\ p,x\ \text{mod}\ q)$ 使得 $\mathbb Z_N$ 与 $\mathbb Z_p\times \mathbb Z_q$ 同构， $\mathbb Z^*_N$ 与 $\mathbb Z^*_p \times \mathbb Z^*_q$ 同构
+
+  - 群元素之间的对应关系可以简记为 $x\lrarr(x\ \text{mod}\ p, x\ \text{mod}\ q)$
+  - 定理可以扩展至 $N=a_1a_2...a_n$ ，其中 $a_1,a_2,...,a_n$ 两两互素
+
+- 同构函数 $f$ 可高效求逆 $f^{-1}$：给定 $f(x)=(x_p,x_q)$ 求 $x$
+
+  - 令 $1_p\lrarr(0,1),\ 1_q\lrarr(0,1)$，有 $(x_p,x_q)\lrarr x=(1_p\cdot x_p,1_q\cdot x_q)\ \text{mod}\ N$
+    - 利用广义欧几里得除法，可得 $X$ 和 $Y$，满足 $Xp+Yq=1$
+    - 易得 $1_p=Yq\ \text{mod}\ N,\ 1_q=Xp\ \text{mod}\ N$
+  - 例：设 $p=5,\ q=7,\ N=35$，将 $(4,3)$ 转换到 $\mathbb Z_{35}^*$ 中对应的元素
+    - 根据广义欧几里得除法，得 $3\cdot5-2\cdot7=1$
+    - 所以 $1_p=-2\cdot7\ \text{mod}\ 35=21$，$1_q=3\cdot5\ \text{mod}\ 35=15$
+    - 所以，$(4,3)\lrarr 4\cdot 21+3\cdot 15\ \text{mod}\ 35=24$
+
+#### 7.2.5 二次剩余及其性质
+
+
+
