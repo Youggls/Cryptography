@@ -720,3 +720,186 @@
   - $101\lrarr(1,3)$
   - 同时对映射前后元素做幂运算 $101^{4\ 800\ 000\ 023}\ \text{mod}\ 35\lrarr(1,5)$（有限群运算封闭，可以找到循环节）
   - $(1,5)\lrarr26$
+
+## 8 循环群相关假设与公钥方案
+
+### 8.1 离散对数
+
+- 离散对数：
+
+  - 给定阶为 $q$ 的循环群 $\mathbb G$ 及其生成元 $g$，有 $\mathbb G=\{g^0,g^1,...,g^{q-1}\}$
+  - 对于任何 $h\in\mathbb G$，存在一个唯一的 $x\in\mathbb Z_q$，使得 $g^x=h$
+  - 用 $\text{log}_gh$ 定义这样的 $x$，即群 $\mathbb G$ 中以 $g$ 为底 $h$ 的离散对数
+
+- 群 $\mathbb G$ 上的**离散对数问题**（Discrete-logarithm Problem, DLP）：给定 $g,h\in\mathbb G$ 求解离散对数 $\text{log}_gh$
+
+- 设 PPT 群生成算法 $GenGroup$
+
+  - 输入安全参数 $\lambda$
+  - 输出一个循环群 $\mathbb G$，其阶为 $q(|q|=\lambda)$，生成元为 $g$
+
+- 离散对数挑战实验 $\text{DLog}_{\mathcal A,Gengroup}(\lambda)$
+
+  - 挑战者运行 $GenGroup(\lambda)$ 生成 $(\mathbb G, q, g)$，选择 $h\larr\mathbb G$
+  - 挑战者给定输入 $\mathbb G,q,g,h$ 给 $\mathcal A$，最后输出 $x\in\mathbb Z_q$
+  - 如果 $g^x=h$，则实验输出 1，否则输出 0
+
+- 如果对于所有 PPT 敌手 $\mathcal A$ 存在一个可忽略函数 $negl$，使得：
+
+  ​								$Pr[\text{DLog}_{\mathcal A,GenGroup}(\lambda)=1]\leq negl(\lambda)$
+
+  则与 $GenGroup$ 相关的离散对数问题是困难的
+
+### 8.2 相关假设
+
+- 给定循环群 $\mathbb G$，以及生成元 $g$，定义 $DH_g(h_1,h_2)=DH_g(g^x,g^y)=g^{xy}$
+
+- 计算性 Diffle-Hellman（Computational Diffle-Hellman, CDH）问题：
+
+  - 给定 $g,h_1,h_2\in\mathbb G$，求解 $DH_g(h_1,h_2)$
+
+- 判定性 Diffle-Hellman 问题（Decisional Diffle-Hellman, DDH） 问题：
+
+  - 给定 $g,h_1,h_2\in \mathbb G$，以及 $h'\in\mathbb G$，判断 $h'$ 是从 $\mathbb G$ 中随机选择的，还是有 $h'=DH_g(h_1,h_2)$
+
+- 定义：如果对于所有 PPT 算法 $\mathcal A$，存在一个可忽略函数 $negl$ 使得
+
+  ​						$|Pr[\mathcal A(\mathbb G,q,g,g^x,g^y,g^z)=1]-Pr[\mathcal A(\mathbb G,q,g,g^x,g^y,g^xy)=1]|\leq negl(\lambda)$
+
+  则称与 $GenGroup$ 相关的 DDH 问题是困难的，概率来源于 $GenGroup(\lambda)$ 的输出以及随机选择的 $x,y,z\in\mathbb Z_q$
+
+- 为什么要与 $GenGroup$ 相关？
+
+  因为与某些 $GenGroup$ 相关的 DDH 问题不是困难的
+
+  - 例：设 PPT 算法 $GenGroup$ 输入 $\lambda$，输出群 $\mathbb Z_p^*$ 及其生成元 $g$，其中 $p$ 为素数且 $|p|=\lambda$，与该算法相关的 DDH 不是困难的
+
+    - 在 $\mathbb Z_p^*$ 上，如果存在 $x$ 满足 $x^2=a\ \text{mod}\ p$，那么 $a$ 是模 $p$ 的二次剩余
+
+    - 设 $p>2$ 为素数，勒让德符号 $(a|p)$ 被定义为
+
+      - 如果 $a$ 是模 $p$ 的二次剩余，那么 $(a|p)=+1$ 否则为 $-1$
+
+    - 设 $p>2$ 为素数，有 $(a|p)=a^{(p-1)/2}\ \text{mod}\ p$
+
+      - $(ab|p)=(a|p)\cdot(b|p)$
+
+    - 模 $p$ 的二次剩余构成一个子群 $\mathcal{QR}_p=\{g^0,g^2,g^4...,g^{p-3}\}$
+
+    - 给定 $g,h_1,h_2\in\mathbb Z_p^*$，以及 $h'\in\mathbb Z_p^*$，算法 $\mathcal A$ 计算 $(h'|p)$ 可以大概率正确判断 $h'$ 是从 $\mathbb Z_p^*$ 中随机选择的还是有 $h'=DH_g(h_1,h_2)=DH_g(g^x,g^y)$
+
+    - 想想为什么？？？
+
+      > 不知道，大概率不考，知道不是困难的就行了
+
+- 如何设计 $GenGroup$：
+
+  - 建议使用素数阶群（可以是模乘子群，也可以是椭圆曲线子群）
+  - 但是用素数阶群既不是 DDH 问题困难的充分条件也不是必要条件
+  - 这里选择强素数  $p=2q+1$（其中 $q$ 为素数）生成 $\mathcal{QR}_p$
+  - $GenGroup(\lambda)\rarr(\mathbb G,q,g)$
+    - 随机产生一个强素数 $p$，且 $|p|=\lambda+1$
+    - 设置 $\mathbb G$ 为 $\mathbb Z_p^*$ 的子群 $\mathcal{QR}_p$
+    - $q:=(p-1)/2$
+    - 选择一个任意的 $x\in\mathbb Z^*_p$ 满足 $x\neq\pm1\ \text{mod}\ p$，将 $x^2\ \text{mod}\ p$ 作为生成元 $g$
+    - 输出 $\mathbb G, q, g$
+
+- 各个困难性假设之间的关系
+
+  - 如果与 $GenGroup$ 相关的 DDH 问题是困难的，那么与 $GenGroup$ 相关的 CDH 问题是困难的- 
+  - 如果与 $GenGroup$ 相关的 CDH 问题是困难的，那么与 $GenGroup$ 相关的 DLP 问题是困难的
+  - 与 $GenGroup$ 相关的问题求解难度：$DDH\leq CDH\leq DLP$
+  - 困难性假设由强到若：$DDH\geq CDH\geq DLP$
+  - 越弱的假设看上去越容易实现
+
+  
+
+### 8.3 密钥交换协议 & ELGamal 公钥加密体制
+
+- ELGamal 安全性基于 DDH（**大概率考**）
+
+#### 8.3.1 Diffle-Hellman 密钥交换协议
+
+- Diffle-Hellman 密钥交换协议 $\Pi$，输入安全参数 $\lambda$
+
+  - $A$ 执行 $GenGroup(\lambda)$ 获得循环群 $(\mathbb G,q,g)$
+
+  - $A$ 均匀随机选择 $x\larr\mathbb Z_q$，计算出 $h_1:=g^x$
+
+  - $A$ 将 $(\mathbb G,q,g,h_1)$ 发送给 $B$
+
+  - $B$ 接收到 $(\mathbb G,q,g,h_1)$ 后，均匀随机选择 $y\larr\mathbb Z_q$，计算出 $h_2:=g^y$
+
+  - $B$ 将 $h_2$ 发送给 $A$，并输出密钥 $k_B:=h_1^y$
+
+  - $A$ 接收到 $h_2$ 后，输出密钥 $k_A:=h_2^x$
+
+  - 正确性：对于所有 $x,y\in\mathbb Z_q$ 和由 $GenGroup$ 输出的 $(\mathbb G,q,g)$ 均有
+
+    ​					$k_B=h_1^y=(g^x)^y=g^{xy}$
+
+    ​					$k_A=h_2^x=(g^y)^x=g^{xy}$
+
+- 给定密钥交换协议 $\Pi$ 和敌手 $\mathcal A$，定义密钥交换实验 $\text{KE}^{eva}_{\mathcal A,\Pi}(\lambda)$：
+
+  - 通信双方 $A,B$ 执行安全参数为 $\lambda$ 的 $\Pi$
+  - 挑战者得到输出密钥 $k$ 和通信过程中所有消息的副本 $trans$
+  - 挑战者选择一个随机比特 $b\larr\{0,1\}$，如果 $b=0$ 则在 $k$ 可能的取值范围内均匀随机选择 $k'$；否则令 $k'=k$
+  - $\mathcal A$ 得到 $trans$ 和 $k'$，最后输出一个比特 $b'$
+  - 如果 $b=b'$，实验输出 1，否则为 0
+
+- 定义：如果对于所有 PPT 敌手 $\mathcal A$，存在一个可忽略函数 $negl$ 使得 $Pr[\text{KE}^{eav}_{\mathcal A,\Pi}(\lambda)=1]\leq1/2+negl(\lambda)$，则称 $\Pi$ 在窃听者存在的情况下是安全的。
+
+- 给定公钥加密体制 $\Pi=(Gen,Enc,Dec)$ 和敌手 $\mathcal A$，其选择明文攻击条件下的不可区分性（IND-CPA）实验 $\text{PubK}^{cpa}_{\mathcal A,\Pi}(\lambda)$ 被定义为
+
+  - 挑战者运行 $Gen(\lambda)$ 生成密钥对 $pk,sk$
+  - 敌手 $\mathcal A$ 被给定 $pk$，$\mathcal A$ 可以访问预言机 $Enc_{pk}(\cdot)$，输出一对长度相等的消息 $m_0,m_1$ 给挑战者
+  - 挑战者随机选择 $b\larr\{0,1\}$，计算挑战密文 $c\larr Enc_{pk}(m_b)$ 并发送给 $\mathcal A$
+  - $\mathcal A$ 可以继续访问 $Enc_{k}(\cdot)$，输出一个比特 $b'$
+  - 如果 $b=b'$ 则实验输出 1，否则输出 0
+
+- 如果对于所有 PPT 敌手 $\mathcal A$，存在一个可忽略函数 $negl$ 使得：
+
+  ​						$Pr[\text{PubK}^{cpa}_{\mathcal A,\Pi}(\lambda)=1]\leq1/2+negl(\lambda)$
+
+  则称 $\Pi$ 具备选择明文攻击条件下的不可区分性（IND-CPA）
+
+- 命题：如果一个公钥加密方案 $\Pi$ 具备窃听者存在情况下的不可区分性，那么 $\Pi$ 也满足 $IND-CPA$
+
+- 定理：在窃听者存在情况下，没有一种**确定性**的公钥加密方案具备不可区分性
+
+#### 8.3.2 ElGamal 公钥加密体制
+
+- ElGamal 加密方案 $\Pi=(Gen,Enc,Dec)$
+
+  - $Gen$：输入 $\lambda$，执行 $GenGroup(\lambda)$ 获得 $(\mathbb G,q,g)$，随机选择 $x\larr\mathbb Z_q$，计算出 $h:=g^x$，最后输出公钥 $pk=(\mathbb G,q,g,h)$ 和私钥 $sk=(\mathbb, G,q,g,x)$
+
+  - $Enc$：给定公钥 $pk=(\mathbb G,q,g,h)$ 和明文 $m\in\mathbb G$，随机选择 $y\larr\mathbb Z_q$，定义输出
+
+    ​						$Enc_{pk}(m)=(g^y,h^y\cdot m)$
+
+  - $Dec$：给定私钥 $sk=(\mathbb G,q,g,x)$ 和密文 $c=(c_1,c_2)$ 定义输出：
+
+    ​						$Dec_{sk}(m)=c_2/c_1^x$
+
+  - 正确性：对于所有 $x,y\in\mathbb Z_q$ 和由 $GenGroup$ 输出的 $(\mathbb G,q,g)$ 均有
+
+    ​						$c_2/c1^x=(h^y\cdot m)/(g^y)^x=((g^x)^y\cdot m)/g^{xy}=g^{xy}\cdot m/g^{xy}=m$
+
+- 定理：如果与 $GenGroup$ 相关的 $DDH$ 问题是困难的，则  $\text{ElGamal}$ 公钥加密方案 $\Pi$ 具备 IND-CPA
+
+  > 证明略，考了我吃💩
+
+### 8.4 例题
+
+- 例 1：数论问题的困难下假设可以保证什么？
+
+  答：该问题在”最坏情况下“求解困难（对于任意概率多项式时间算法，求解成功的概率可以忽略）
+
+- 例 2：选择安全参数 $\lambda=4$，$GenGroup$ 生成素数 $p=23$，得到循环群 $\mathbb Z^*_{23}$ 的子群 $\mathcal{QR}_{23}$ 作为 $\mathbb G$，其阶 $q=(p=1)/2=11$，有生成元 $g=9=32\ \text{mod}\ 23$
+
+  - $A$ 和 $B$ 分别随机选择 $x=5$ 和 $y=9$
+  - $A$ 计算 $h_1=9^5\ \text{mod}\ 23=8$；$B$ 计算 $h_2=9^9\ \text{mod}\ 23=2$
+  - $A$ 和 $B$ 交换 $h_1$ 和 $h_2$
+  - $A$ 计算 $k_A=2^5\ \text{mod}\ 23=9$；$B$ 计算 $k_B=8^9\ \text{mod}\ 23=9$
+
