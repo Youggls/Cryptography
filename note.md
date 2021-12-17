@@ -903,3 +903,94 @@
   - $A$ 和 $B$ 交换 $h_1$ 和 $h_2$
   - $A$ 计算 $k_A=2^5\ \text{mod}\ 23=9$；$B$ 计算 $k_B=8^9\ \text{mod}\ 23=9$
 
+## 9 RSA 公钥加密体制与随机预言机
+
+### 9.1 RSA 假设 & 整数分解假设
+
+#### 9.1.1 整数分解假设
+
+- 给定 $p,q$，计算得到 $N:=p\cdot q$，该计算是高效计算
+
+- 整数分解问题为给定合数 $N$，求解 $p,q>1$，使得 $N=p\cdot q$
+
+- 设 PPT 模数生成算法 $GenModulus$
+
+  - 输入安全参数 $\lambda$，输出 $(N,p,q)$，其中 $N=pq$，$p,q$ 为素数，且 $|p|=|q|=\lambda$
+
+- 整数分解实验 $\text{Factor}_{\mathcal A,GenModulus}(\lambda)$
+
+  - 挑战者运行 $GenModulus$ 生成 $(N,p,q)$
+  - $\mathcal A$ 被给定 $N$，最后输出 $p',1'>1$
+  - 如果 $p'\cdot q'=N$，则实验输出 1，否则输出 0
+
+- 定义：如果对于所有 PPT 敌手 $\mathcal A$，存在一个可忽略的函数 $negl$，使得
+
+  ​							$Pr[\text{Factor}_{\mathcal A,GenModulus}(\lambda)=1]\leq negl(\lambda)$
+
+  则与 $GenModulus$ 相关的整数分解问题是困难的
+
+- 为什么要与 $GenModulus$ 相关？
+
+  - 因为与某些 $GenModulus$ 相关的整数分解问题不是困难的
+  - 例：设 PPT 算法输出中 $p-1$ 只有小因子（具有多项式边界 $B$），与该算法相关的整数分解问题不是困难的
+
+#### 9.1.2 RSA 假设
+
+- RSA 问题：
+
+  - 给定 $N$，一个与 $\phi(N)$ 互素的整数 $e>0\ (\text{gcd}(e,\phi(N))=1)$，以及 $y\in\mathbb Z_N^*$，找到 $x\in\mathbb Z_N^*$ 满足 $x^e=y\ \text{mod}\ N$
+
+- 重要定理与推论
+
+  - 定理：设 $\mathbb G$ 为阶为 $m$ 的有限群，对任意元素 $g\in\mathbb G$，有 $g^m=1$
+  - 推论：设 $\mathbb G$ 为阶为 $m$ 的有限群，则对任意元素和整数 $i$，有 $g^i=g^{i\ \text{mod}\ m}$
+  - 推论：设 $\mathbb G$ 为阶为 $m$ 的有限群，令整数 $e>0$
+    - 定义函数 $f_e:\mathbb G\rarr\mathbb G$，且 $f_e(g)=g^e$
+    - 如果 $\text{gcd}(e,m)=1$，那么 $f_e$ 是一个置换
+    - 此外，如果 $e\cdot d=1\ \text{mod}\ m$，则 $f_d$ 是 $f_e$ 的逆置换
+  - 故在 $\mathbb Z_N^*$ 中有 $x=f_d(f_e(x))=f_d(y)$，即 RSA 问题 $x^e=y\ \text{mod}\ N$ 的解是存在的。
+
+- RSA 问题：困难性假设
+
+  设 PPT 问题生成算法 $GenRSA$
+
+  - 输入安全参数 $\lambda$
+  - 运行 $GenModulus(\lambda)$ 输出 $(N,p,q)$，选择 $e>0$ 使得 $\text{gcd}(e,\phi(N))=1$，计算 $d$ 使得 $e\cdot d=1\ \text{mod}\ \phi(N)$，然后输出 $(N,e,d)$
+
+- RSA 问题i求解实验 $\text{RSA-inv}_{\mathcal A,RSA}(\lambda)$
+
+  - 挑战者运行 $GenRSA(\lambda)$ 生成 $(N,e,d)$，选择 $y\in\mathbb Z_N^*$
+  - $\mathcal A$ 被给定 $(N,e,y)$，最后输出 $x\in \mathbb Z_N^*$
+  - 如果 $x^e=y\ \text{mod}\ N$，则实验输出 1，否则输出 0
+
+- 定义：如果对于所有 PPT 敌手 $\mathcal A$，存在一个可忽略函数 $negl$ 使得：
+
+  ​									$Pr[\text{RSA-inv}_{\mathcal A,GenRSA}(\lambda)=1]\leq negl(\lambda)$
+
+  则与 $GenRSA$ 相关的 RSA 问题是困难的
+
+#### 9.1.3 困难性假设之间的关系
+
+- 如果与 $GenRSA$ 相关的 RSA 问题是困难的，那么与 $GenModulus$ 相关的整数分解问题是困难的
+  - 如果与 $GenModulus$ 相关的整数分解问题可以被高效地求解，那么与 $GenRSA$ 相关的 RSA 分解问题也可以被高效地求解
+- 问题求解难度：$RSA\leq 整数分解$
+- 困难行假设由强到弱：$RSA\geq 整数分解$
+
+### 9.2 随机预言机
+
+- 随机预言机被视为一个函数 $H$
+  - 被视为一个可以公共访问的”黑盒“，对预言机询问 $x$ 输出 $y$
+  - 但一方对随机预言机的访问是秘密的
+    - 其他方不知道询问的内容，以及是否询问过
+  - 当输入为 $x$ 时
+    - 如果 $x$ 未被询问过，在 $H$ 的值域上输出一个随机值作为 $y$
+    - 否则，仍输出与之前询问时相同的回答 $y$
+- 安全模型
+  - 随机预言机模型（RO模型）：构造使用了随机预言机
+  - 标准模型：构造未使用随机预言机
+
+### 9.3 例题
+
+- 例 1：如果有人设计出了一种在标准模型下可证安全的 RSA 加密方案，其安全性必然基于什么困难性假设：RSA
+- 例 2：给定输入 $x$，根据不同情况，随机预言机 $H$ 分别输出什么？
+
