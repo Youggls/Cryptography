@@ -1,6 +1,7 @@
 # 现代密码学
 
 > 2021 级南开大学计算机学院（研究生课）密码学期末重点
+> 使用前请先阅读[免责声明](https://github.com/Youggls/Cryptography/blob/master/README.md)
 
 ## 1 现代密码学基本原则
 
