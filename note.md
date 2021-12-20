@@ -173,12 +173,9 @@
   则称 $\Pi$ 具备选择明文攻击条件下的不可区分性（IND-CPA）
 
   - 如果方案是确定加密($Enc$ 是确定算法)，必然不满足 IND-CPA
-
-    敌手在产生不同的 $m_0$ 和 $m_1$ 后，计算得到 $c_0\larr Enc_k(m_0)$ 和 $c_1\larr Enc_k(m_1)$
-
-    在得到挑战密文 $c$ 之后，进行比较，如果 $c=c_0$ 输出 0，否则输出 1
-
-    此时概率为 1
+  - 敌手在产生不同的 $m_0$ 和 $m_1$ 后，计算得到 $c_0\larr Enc_k(m_0)$ 和 $c_1\larr Enc_k(m_1)$
+  - 在得到挑战密文 $c$ 之后，进行比较，如果 $c=c_0$ 输出 0，否则输出 1
+  - 此时概率为 1
   
 - 确定性算法不可能满足 IND-CPA
 
@@ -194,7 +191,7 @@
 
 - 伪随机性：对于所有概率多项式时间区分器 $D：\{0,1\}^{\lambda}\rarr\{0,1\}$ 而言，存在一个可忽略函数 $negl$ 使得：
 
-  $|Pr(D(r)=1)-Pr(D(G(s)))=1|\leq negl(\lambda)$
+  ​					$|Pr(D(r)=1)-Pr(D(G(s)))=1|\leq negl(\lambda)$
 
   其中 $r$ 在 $\{0,1\}^{l(\lambda)}$ 上均匀随机选取，种子 $s$ 在 $\{0,1\}\lambda$ 上均匀随机选取
 
@@ -202,7 +199,7 @@
 
 令 $F:\{0,1\}^*\times\{0,1\}^*\rarr \{0,1\}^*$ 是有效的、长度保留的（$|F_k(x)|=|x|$）、带密钥的函数，称 $F$ 是一个伪随机函数，如果其满足对所有概率多项式时间区分器 $\mathcal D$ 而言存在一个可忽略函数 $negl$ 使得
 
- $|Pr[\mathcal D^{F_k(\cdot)}(\lambda)=1]-Pr[\mathcal D^{f(\cdot)}(\lambda)=1]|\leq negl(\lambda)$
+​							 $|Pr[\mathcal D^{F_k(\cdot)}(\lambda)=1]-Pr[\mathcal D^{f(\cdot)}(\lambda)=1]|\leq negl(\lambda)$
 
 其中，$k$ 在 $\{0,1\}^\lambda$ 上均匀随机选取，函数 $f$ 在 $Func_k=\{f|f:\{0,1\}^\lambda\rarr \{0,1\}^\lambda\}$ 上均匀随机选取
 
@@ -249,13 +246,13 @@
 
 - 定义：令 $F:\{0,1\}^*\times\{0,1\}^*\rarr\{0,1\}^*$ 是有效的带密钥的置换，称 $F$ 是一个**伪随机置换**如果其满足对所有**概率多项式时间**区分器 $\mathcal D$ 而言存在一个可忽略函数 $negl$，使得：
 
-  $|Pr[\mathcal D^{F_k(\cdot)}=1]-Pr[\mathcal D^{f(\cdot)}(\lambda)]|\leq negl(\lambda)$
+  ​						$|Pr[\mathcal D^{F_k(\cdot)}=1]-Pr[\mathcal D^{f(\cdot)}(\lambda)]|\leq negl(\lambda)$
 
   其中 $k$ 在 $\{0,1\}^\lambda$ 上均匀随机选取， $f$ 是从 $\lambda$ 比特串置换的集合中均匀随机选择的
 
 - **强伪随机置换**定义：令 $F:\{0,1\}^*\times\{0,1\}^*\rarr\{0,1\}^*$ 是有效的带密钥的置换，称 $F$ 是一个**伪随机置换**如果其满足对所有**概率多项式时间**区分器 $\mathcal D$ 而言存在一个可忽略函数 $negl$，使得：
 
-  $|Pr[\mathcal D^{F_k(\cdot),F^{-1}_k(\cdot)}=1]-Pr[\mathcal D^{f(\cdot),f^{-1}(\cdot)}(\lambda)]|\leq negl(\lambda)$
+  ​						$|Pr[\mathcal D^{F_k(\cdot),F^{-1}_k(\cdot)}=1]-Pr[\mathcal D^{f(\cdot),f^{-1}(\cdot)}(\lambda)]|\leq negl(\lambda)$
 
   其中 $k$ 在 $\{0,1\}^\lambda$ 上均匀随机选取， $f$ 是从 $\lambda$ 比特串置换的集合中均匀随机选择的
 
@@ -497,17 +494,17 @@
 
   - $Mac$ 标记生成算法：输入密钥 $k$ 和明文 $m\in\{0,1\}^*$，输出标记  $t$
 
-    $t\larr Mac_k(m)$
+    ​					$t\larr Mac_k(m)$
 
   - $Vrfy$ 校验算法：输入密钥 $k$ 和标记 $t$，输出比特位 $b$
 
-    $b:=Vrfy_k(m,t)$
+    ​					$b:=Vrfy_k(m,t)$
 
     如果 $b=1$，证明消息有效，否则无效
 
   - 如果该方案是正确的，则对于所有的 $m\in\{0,1\}^*$ 和由 $Gen$ 输出的 $k$ 均有
 
-    $Vrfy_k(m,Mac_k(m))=1$
+    ​					$Vrfy_k(m,Mac_k(m))=1$
 
 #### 6.1.3 安全性
 
@@ -554,7 +551,7 @@
 
   - 标记生成算法 $Mac$：给定密钥 $k\in \{0,1\}^\lambda$ 和消息明文 $m\in \{0,1\}^\lambda$，定义输出
 
-    $Mac_k(m)=F_k(m)$
+    ​						$Mac_k(m)=F_k(m)$
 
   - 校验算法 $Vrfy$：给定密钥 $k\in\{0,1\}^\lambda$、消息明文 $m\in\{0,1\}^\lambda$ ，以及标记 $t\in \{0,1\}^\lambda$，判断 $t?=F_k(m)$，如果成立输出 1；否则输出 0
 
@@ -600,7 +597,7 @@
 
 - $Gen$ 密钥生成算法：输入安全参数 $\lambda$，输出密钥 $s\ (|s|>\lambda)$
 
-  $s\larr Gen(\lambda)$
+  ​						$s\larr Gen(\lambda)$
 
 - 对 $H$ 输入密钥 $s$ 和一个比特串 $x\in \{0,1\}^*$，输出一个比特串 $H^s(x)\in\{0,1\}^{l(\lambda)}$，其中 $l$ 为多项式
 
@@ -625,8 +622,8 @@
 对于散列函数 $H^s$ 而言，抗碰撞是一个较强的安全性需求，典型的安全级别三种：
 
 - 抗碰撞。（只给 $s$，找 $x$ 和 $x'$）
-- 抗第二原相：如果给定输入 $s$ 和 $x$，对于 PPT 敌手而言，找到 $x'$ 满足 $x\neq x'$ 且 $H^s(x')=H^s(x)$ 是不可行的。（给一个x找另一个）
-- 抗原相：如果给定输入 $s$ 和 $y=H^s(x)$，对于 PPT 敌手而言，找到 $x'$ 满足 $H^s(x')=y$ 是不可行的。（给定y，找到x满足）
+- 抗第二原相：如果给定输入 $s$ 和 $x$，对于 PPT 敌手而言，找到 $x'$ 满足 $x\neq x'$ 且 $H^s(x')=H^s(x)$ 是不可行的。（给一个 $x$ 找另一个）
+- 抗原相：如果给定输入 $s$ 和 $y=H^s(x)$，对于 PPT 敌手而言，找到 $x'$ 满足 $H^s(x')=y$ 是不可行的。（给定 $y$，找到 $x$ 满足）
 
 
 
@@ -634,9 +631,9 @@
 
 - 生日攻击：PPT 49，50
 
-- 变长散列函数构造（Merkle-Damgard变换）：PPT 51，52
+- 变长散列函数构造（Merkle-Damgard 变换）：PPT 51，52
 
-- 基于散列的消息鉴别码（HMAC*大致了解*）
+- 基于散列的消息鉴别码（HMAC *大致了解*）
 
   结合 Hash 和 MAC。
 
@@ -745,8 +742,6 @@
     - 如果 $\mathbb G$ 是有生成元的，那么 $\mathbb G$ 被称为循环群
   - $\mathbb Z_8$ 为一个循环群， $3$ 是生成元而 $2$ 不是
   - $\mathbb Z_7^*$ 是一个循环群，$3$ 是生成元
-  - 
-
 - 重要定理
 
   - 命题：设 $\mathbb G$ 是阶为 $q$ 的有限群，若 $g\in \mathbb G$ 的阶为 $i$，则 $i|q$
@@ -924,11 +919,10 @@
 
   - 如果与 $GenGroup$ 相关的 DDH 问题是困难的，那么与 $GenGroup$ 相关的 CDH 问题是困难的；如果与 $GenGroup$ 相关的 CDH 问题可以被高效地求解，那么与 $GenGroup$ 相关的 DDH 问题也可以被高效地求解。
   - 如果与 $GenGroup$ 相关的 CDH 问题是困难的，那么与 $GenGroup$ 相关的 DLP 问题是困难的；如果与 $GenGroup$ 相关的DLP可以被高效地求解，那么与 $GenGroup$ 相关的 CDH 问题也可以被高效地求解。
-  - 
   - 与 $GenGroup$ 相关的问题求解难度：$DDH\leq CDH\leq DLP$
   - 困难性假设由强到弱：$DDH\geq CDH\geq DLP$
-- 越弱的假设看上去越容易实现
   
+- 越弱的假设看上去越容易实现
   
 
 ### 8.3 DH密钥交换协议 & ELGamal 公钥加密体制
