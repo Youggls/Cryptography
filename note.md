@@ -1297,9 +1297,10 @@ RSA 陷门置换有两个常用的硬核谓词：求最高位比特函数 $msb(x
   			 &= [m_x(2^{\lambda - 1} +1)]^d \mod N \\
   			 &= [2^e(2^{\lambda - 1} +1)]^d \mod N \\
   			 &= 2^{ed}\cdot(2^{\lambda-1}+1)^d \mod N\\
-               &= 1 \cdot (2^{\lambda-1}+1)^d \mod N\\
-               &= encode(1)^d \mod N\\
-               &= Sign_{sk}(1)
+               &= 2 \cdot (2^{\lambda-1}+1)^d \mod N\\
+               &= 2 * encode(1)^d \mod N\\
+               &= 2 * Sign_{sk}(1)
   \end{align}
   $$
-  以此类推，任取 $m_0 = 2^{ke} \in \{0, 1\}^{\lambda-2}$，有 $Sign_{sk}(m_0) = Sign_{sk}(2^k)$ 成立，因此，该方案不安全。
+  因此，该方案不安全。
+
