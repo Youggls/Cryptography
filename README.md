@@ -14,11 +14,11 @@
 
 感谢以下人员对本复习笔记的贡献
 
-- @BBBBchan
+- [@BBBBchan](https://github.com/BBBBchan)
 - hxt
-- @Jack-Lio
-- @youxiho1
-- @NK-CS-ZZL
+- [@Jack-Lio](https://github.com/Jack-Lio)
+- [@youxiho1](https://github.com/youxiho1)
+- [@NK-CS-ZZL](https://github.com/NK-CS-ZZL)
 
 ## 免责声明
 
