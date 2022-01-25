@@ -6,6 +6,10 @@
 
 欢迎贡献~
 
+## 下载
+
+请到 [release](https://github.com/Youggls/Cryptography/releases) 页面下载 Release 文件。
+
 ## 致谢
 
 感谢以下人员对本复习笔记的贡献
