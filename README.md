@@ -10,6 +10,11 @@
 
 请到 [release](https://github.com/Youggls/Cryptography/releases) 页面下载 Release 文件。
 
+## 如何贡献
+
+1. 请给本人发邮件，邮件可在本人 [Github 主页](https://github.com/Youggls)找到
+2. 在本 repo 中发起 Pull Request 或提出 issue
+
 ## 致谢
 
 感谢以下人员对本复习笔记的贡献
